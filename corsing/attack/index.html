@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+    
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="bootstrap.min.css">
+        <style>
+            .select-editable { position:relative; background-color:white; border:solid grey 1px;  width:120px; height:18px; }
+            .select-editable select { position:absolute; top:0px; left:0px; font-size:14px; border:none; width:120px; margin:0; }
+            .select-editable input { position:absolute; top:0px; left:0px; width:100px; padding:1px; font-size:12px; border:none; }
+            .select-editable select:focus, .select-editable input:focus { outline:none; }
+        </style>
+    </head>
+    <body>
+        <img src="http://127.0.0.1:5000/nocors" />
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <select id="method" class="form-control">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="HEAD">HEAD</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                    <option value="RANDOM">RANDOM</option>
+                </select>
+            </div>
+            <input type="text" class="form-control" value="http://127.0.0.1:5000" id="url">
+            <div class="input-group-append" id="button-addon4">
+                <select id="uri" class="form-control">
+                    <option value="/nocors">No CORS</option>
+                    <option value="/nocors_creds">No CORS withCredentials</option>
+                    <option value="/null">NULL</option>
+                    <option value="/null_creds">NULL withCredentials</option>
+                    <option value="/wildcard">Wildcard</option>
+                    <option value="/wildcard_creds">Wildcard withCredentials</option>
+                    <option value="/reflected">Reflected</option>
+                    <option value="/reflected_creds">Reflected withCredentials</option>
+                </select>
+            </div>
+          </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm">
+                    <label for="withCredentials">Request withCredentials: </label><input class="form-control" type="checkbox" id="withCredentials" name="withCredentials" value="withCredentials">
+                </div>
+                <div class="col-sm">
+                    <label for="withData">Request withData: </label><input class="form-control" type="checkbox" id="withData" name="withData" value="withData">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm">
+                    <label for="contenttype">Content Type: </label>
+                    <div class="select-editable">
+                        <select onchange="this.nextElementSibling.value=this.value">
+                          <option value=""></option>
+                          <option value="application/json; charset=UTF-8">application/json; charset=UTF-8</option>
+                          <option value="120x160 mm">120x160 mm</option>
+                          <option value="120x287 mm">120x287 mm</option>
+                        </select>
+                        <input type="text" id="contenttype" name="format" value=""/>
+                      </div>
+                </div>
+                <div class="col-sm">
+                    <button class="btn btn-primary" onclick="request()">Send request</button>
+                </div>
+              </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Content</span>
+                    </div>
+                    <textarea id="content" class="form-control" aria-label="Content" rows=16></textarea>
+                  </div>
+            </div>
+        </div>         
+
+
+        <!-- <img src="http://127.0.0.1:5000/nocors"> -->
+        <script src="jquery-3.5.1.min.js"></script>
+        <script src="bootstrap.min.js"></script>
+
+        <script>
+            function callback() {
+                  console.log(this);
+                  console.log("%cResponse headers:", "font-size: 16px");
+                  console.log(this.getAllResponseHeaders());
+                  console.log("%cResponse body:", "font-size: 16px");
+                  console.log(this.responseText);
+            }
+
+            function request() {
+                let uri = document.getElementById("uri").value
+                let url = document.getElementById("url").value + uri;
+                var req = new XMLHttpRequest();
+                req.onload = callback;
+                req.onerror = callback;
+                let method = document.getElementById("method").value;
+                console.log(`Attempting ${ method } at ${ url }", "color: red; font-size: 16px`);
+                req.open(method, url, true);
+                let content_type = document.getElementById("contenttype").value;
+                if(document.getElementById("contenttype").value) {
+                    req.setRequestHeader("Content-Type", content_type);
+                }
+                req.withCredentials = document.getElementById("withCredentials").checked;
+                if(document.getElementById("withData").checked) {
+                    req.send(document.getElementById("content").value)
+                } else {
+                    req.send();
+                }
+            }
+
+        </script>
+    </body>
+</html>
